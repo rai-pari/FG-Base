@@ -96,7 +96,7 @@ const MediaFrameSelector: React.FC<MediaFrameSelectorProps> = ({ fileURL, isVide
 
   return (
     <div className="p-4 flex flex-col items-center w-full">
-      <div className="flex flex-col justify-center items-center gap-8 w-full max-w-6xl">
+      <div className="flex justify-center items-center gap-8 w-full max-w-6xl">
         {isVideo && fileURL && (
           <div className="flex flex-col justify-center items-center w-full max-w-2xl">
           <h2 className="text-xl font-semibold mb-2 self-start">Video Preview:</h2>

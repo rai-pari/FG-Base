@@ -76,17 +76,6 @@ const Dashboard = () => {
     setParams(newParams);
     setRules(ruleRows);
   };
-
-  React.useEffect(() => {
-    const savedFile = localStorage.getItem('selectedFile');
-    const savedPreviewUrl = localStorage.getItem('previewUrl');
-  
-    if (savedFile && savedPreviewUrl) {
-      // Creating a File from Blob with necessary attributes
-      setSelectedFile(new File([savedFile], 'filename.mp4', { type: 'video/mp4' }));
-      setPreviewUrl(savedPreviewUrl);
-    }
-  }, []);
   
 
   // Handle file selection
@@ -96,10 +85,6 @@ const Dashboard = () => {
       setSelectedFile(file);
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
-
-      // Save to localStorage
-      localStorage.setItem('selectedFile', file.name); // or you could use `file` data depending on the need
-      localStorage.setItem('previewUrl', url);
     }
   };
 

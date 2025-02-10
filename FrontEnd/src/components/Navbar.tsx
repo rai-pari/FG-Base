@@ -6,7 +6,8 @@ const Navbar = () => {
   const location = useLocation();
 
   const pageNameItems = [
-    { pageName: "Dashboard", path: "/" },
+    { pageName: "Configuration", path: "/" },
+    { pageName: "Dashboard", path: "/dashboard" },
     { pageName: "Cameras", path: "/cameras" },
     { pageName: "Detection Models", path: "/models" },
     { pageName: "Processing Rules", path: "/rules" },

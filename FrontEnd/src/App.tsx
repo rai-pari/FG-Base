@@ -7,6 +7,7 @@ import ProcessingRules from "./components/ProcessingRules";
 import Database from "./components/Database";
 import Insights from "./components/Insights";
 import Navbar from "./components/Navbar";
+import Configuration from "./components/Configuration";
 
 function App() {
   return (
@@ -16,7 +17,8 @@ function App() {
         <main className="flex-1 ml-64">
           <Navbar />
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<Configuration />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/cameras" element={<CameraList />} />
             <Route path="/models" element={<ModelSelection />} />
             <Route path="/rules" element={<ProcessingRules />} />

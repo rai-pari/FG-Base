@@ -5,6 +5,7 @@ import {
   Settings,
   BarChart3,
   Database,
+  MonitorCog,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -12,7 +13,8 @@ const Sidebar = () => {
   const location = useLocation();
 
   const menuItems = [
-    { icon: LayoutDashboard, label: "Dashboard", path: "/" },
+    { icon: MonitorCog, label: "Configuration", path: "/" },
+    { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
     { icon: Camera, label: "Cameras", path: "/cameras" },
     { icon: MonitorPlay, label: "Detection Models", path: "/models" },
     { icon: Settings, label: "Processing Rules", path: "/rules" },

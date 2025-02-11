@@ -25,6 +25,11 @@ import { ProcessingRulesModel } from "../store/models/ProcessingRules";
 // import Backdrop from "./common/Backdrop";
 // import PageHeader from "./common/PageHeader";
 import MediaFrameSelector from "./insights/MediaFrameSelector";
+import { setPreivewUrl as setVideoPreviewUrl } from "../store/api/localData/previewUrl";
+import { setDetectionModel } from "../store/api/localData/detectionModel";
+import { setIsToggled, setStorageLocation, setOutputFormat, setSaveDetectionImages } from "../store/api/localData/outputConfiguration";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../store/middleware";
 
 const Configuration = () => {
   // const [selectedCamera, setSelectedCamera] = React.useState(
@@ -49,18 +54,30 @@ const Configuration = () => {
   } = useGetOutputConfigurationsQuery();
   const { data: ruleRows = [], isLoading: rulesLoading } =
     useGetProcessingRulesQuery();
+  
+  const dispatch = useDispatch<AppDispatch>();
+  const savedPreivewUrl = useSelector((state: RootState) => state.previewUrl.previewUrl);
+  const savedDetectionMdoel = useSelector((state:RootState) => state.detectionModel.selectedModel);
+  const savedOutputConfiguration = useSelector((state: RootState) => state.outputConfiguration);
+  
+  React.useEffect(() => {
+    console.log("outputConfiguration", savedOutputConfiguration);
+  }, [savedOutputConfiguration])
 
-  const [selectedModel, setSelectedModel] = React.useState(modelRows[0]?.name);
+  const [selectedModel, setSelectedModel] = React.useState(savedDetectionMdoel || modelRows[0]?.name);
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = React.useState<string | null>(savedPreivewUrl || null);
   const [peopleCount, setPeopleCount] = React.useState<number | null>(null);
   const [durationRate, setDurationRate] = React.useState<number | null>(null);
   const [rules, setRules] = React.useState<ProcessingRulesModel[]>([]);
   const [params, setParams] = React.useState<Record<string, boolean>>({});
-  const [saveOutput, setSaveOutput] = React.useState<boolean>(false);
+  const [saveOutput, setSaveOutput] = React.useState<boolean>(savedOutputConfiguration.isToggled || false);
   const [output, setOutput] = React.useState<string[]>(
     outputObject.current_output_configurations
   );
+  const [isChecked, setIsChecked] = React.useState<boolean>(savedOutputConfiguration.saveDetectionImages || false);
+
+  
 
   if (ruleRows.length > 0 && rules.length === 0) {
     const newParams = ruleRows.reduce<Record<string, boolean>>(
@@ -84,6 +101,7 @@ const Configuration = () => {
     if (file) {
       setSelectedFile(file);
       const url = URL.createObjectURL(file);
+      dispatch(setVideoPreviewUrl(url));
       setPreviewUrl(url);
     }
   };
@@ -205,7 +223,10 @@ const Configuration = () => {
               <select
                 className="w-full border border-gray-300 rounded-lg p-2"
                 value={selectedModel}
-                onChange={(e) => setSelectedModel(e.target.value)}
+                onChange={(e) => {
+                  setSelectedModel(e.target.value);
+                  dispatch(setDetectionModel(e.target.value));
+                }}
               >
                 {modelRows
                   .filter((model: DetectionModel) => model.active)
@@ -273,7 +294,13 @@ const Configuration = () => {
                     type="checkbox"
                     className="sr-only peer"
                     checked={saveOutput}
-                    onClick={() => setSaveOutput((prev) => !prev)}
+                    onChange={() => {
+                      setSaveOutput((prev) => {
+                        const newValue = !prev;
+                        dispatch(setIsToggled(newValue)); // Use the updated value
+                        return newValue;
+                      });
+                    }}
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                 </label>
@@ -288,7 +315,10 @@ const Configuration = () => {
               <select
                 className="w-full border border-gray-300 rounded-lg p-2"
                 value={output[0]}
-                onChange={(e) => setOutput((prev) => [e.target.value, prev[1]])}
+                onChange={(e) => {
+                  setOutput((prev) => [e.target.value, prev[1]])
+                  dispatch(setStorageLocation(e.target.value));
+                }}
               >
                 {outputObject.storage.map((option) => (
                   <option key={option} value={option}>
@@ -304,7 +334,10 @@ const Configuration = () => {
               <select
                 className="w-full border border-gray-300 rounded-lg p-2"
                 value={output[1]}
-                onChange={(e) => setOutput((prev) => [prev[0], e.target.value])}
+                onChange={(e) => {
+                  setOutput((prev) => [prev[0], e.target.value])
+                  dispatch(setOutputFormat(e.target.value));
+                }}
               >
                 {outputObject.format.map((option) => (
                   <option key={option} value={option}>
@@ -314,7 +347,10 @@ const Configuration = () => {
               </select>
             </div>
             <div className="flex items-center gap-2">
-              <input type="checkbox" id="save-images" className="rounded" />
+              <input type="checkbox" id="save-images" className="rounded" checked={isChecked} onChange={(e) => {
+                setIsChecked(prev => !prev);
+                dispatch(setSaveDetectionImages(e.target.checked));
+              }} />
               <label htmlFor="save-images" className="text-sm text-gray-700">
                 Save detection images
               </label>

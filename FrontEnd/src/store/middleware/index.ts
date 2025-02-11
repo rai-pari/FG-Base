@@ -4,6 +4,9 @@ import { detectionModelsApi } from "../api/detectionModels";
 import { processingRulesApi } from "../api/processingRules";
 import { outputConfigurationsApi } from "../api/outputConfigurations";
 import { areaCoordinatesApi } from "../api/areaCoordinates";
+import previewUrlReducer from "../api/localData/previewUrl";
+import detectionModelReducer from "../api/localData/detectionModel";
+import outputConfigurationReducer from "../api/localData/outputConfiguration"
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +15,9 @@ export const store = configureStore({
     [processingRulesApi.reducerPath]: processingRulesApi.reducer,
     [outputConfigurationsApi.reducerPath]: outputConfigurationsApi.reducer,
     [areaCoordinatesApi.reducerPath]: areaCoordinatesApi.reducer,
+    previewUrl: previewUrlReducer,
+    detectionModel: detectionModelReducer,
+    outputConfiguration: outputConfigurationReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(

@@ -111,6 +111,7 @@ const Configuration = () => {
     //   console.error("No file selected");
     //   return;
     // }
+    fetch("http://localhost:8000/clear-frames", { method: "POST" });
 
     const formData = new FormData();
     selectedFile && formData.append("file", selectedFile);

@@ -2,6 +2,7 @@ import React from "react";
 import { BarChart } from "lucide-react";
 import { RootState } from "../store/middleware";
 import { useSelector } from "react-redux";
+import Graph from "./insights/Graph";
 
 
 function Dashboard() {
@@ -42,7 +43,11 @@ function Dashboard() {
             </p>
           </div>
         </div>
+        <div>
+          <Graph />
+        </div>
       </div>
+      
     </div>
   );
 }

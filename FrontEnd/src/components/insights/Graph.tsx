@@ -121,17 +121,17 @@ const Graph: React.FC = () => {
         <div className="p-4 w-full flex flex-col items-center justify-center min-h-screen">
             <h2 className="text-xl font-semibold mb-4 text-center">Live Data Monitoring</h2>
 
-            <div className="w-[90%] flex flex-col justify-between items-center space-x-6">
+            <div className="w-[90%] flex flex-row justify-between items-center space-x-6">
                 {/* Persons Count Chart */}
                 <div className="w-1/2 flex flex-col items-center">
                     <h3 className="text-lg font-medium mb-2">Persons Count</h3>
-                    <ReactApexChart options={areaChartOptionsPersons} series={personsChartData} type="area" height={400} width={500} />
+                    <ReactApexChart options={areaChartOptionsPersons} series={personsChartData} type="area" height={400} width={400} />
                 </div>
 
                 {/* Total Dwell Time Chart */}
                 <div className="w-1/2 flex flex-col items-center">
                     <h3 className="text-lg font-medium mb-2">Total Dwell Time</h3>
-                    <ReactApexChart options={areaChartOptionsDwellTime} series={dwellTimeChartData} type="area" height={400} width={500} />
+                    <ReactApexChart options={areaChartOptionsDwellTime} series={dwellTimeChartData} type="area" height={400} width={400} />
                 </div>
             </div>
         </div>

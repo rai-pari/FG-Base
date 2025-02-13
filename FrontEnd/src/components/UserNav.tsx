@@ -19,12 +19,12 @@ const UserNav: React.FC = () => {
         onClick={() => setOpen(!open)}
       >
         <div className="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center">
-          {/* {userData?.name.charAt(0).toUpperCase()} */}K
+          {/* {userData?.name.charAt(0).toUpperCase()} */}J
         </div>
         <div>
           <h3 className="text-sm font-medium">
             {/* {userData?.name} */}
-            Kunal Verma
+            Jayesh Dave
           </h3>
           <h4 className="text-xs text-gray-600">
             {/* {role} */}
@@ -39,11 +39,11 @@ const UserNav: React.FC = () => {
           <div className="p-3 border-b">
             <p className="text-sm font-medium">
               {/* {userData?.name} */}
-              Kunal Verma
+              Jayesh Dave
             </p>
             <p className="text-xs text-gray-500">
               {/* {userData?.username} */}
-              verma@100
+              jayesh@100
             </p>
           </div>
           <ul>

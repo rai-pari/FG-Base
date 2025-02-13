@@ -7,6 +7,8 @@ import { areaCoordinatesApi } from "../api/areaCoordinates";
 import previewUrlReducer from "../api/localData/previewUrl";
 import detectionModelReducer from "../api/localData/detectionModel";
 import outputConfigurationReducer from "../api/localData/outputConfiguration"
+import videoResultsReducer from "../api/localData/videoResultsData"
+import processingLogicReducer from "../api/localData/processingLogic"
 
 export const store = configureStore({
   reducer: {
@@ -17,7 +19,9 @@ export const store = configureStore({
     [areaCoordinatesApi.reducerPath]: areaCoordinatesApi.reducer,
     previewUrl: previewUrlReducer,
     detectionModel: detectionModelReducer,
-    outputConfiguration: outputConfigurationReducer
+    outputConfiguration: outputConfigurationReducer,
+    videoResults: videoResultsReducer,
+    processingLogic: processingLogicReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(

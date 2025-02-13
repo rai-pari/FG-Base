@@ -2,15 +2,13 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 interface OutputConfiguration{
     isToggled: boolean | null
-    storageLocation: string,
-    outputFormat: string,
+    outputConfig: string[]
     saveDetectionImages: boolean | null
 }
 
 const initialState: OutputConfiguration = {
     isToggled: null,
-    storageLocation: "Cloud Storage",
-    outputFormat: "CSV",
+    outputConfig: [],
     saveDetectionImages: null
 }
 
@@ -21,11 +19,8 @@ const outputConfigurationSlice = createSlice({
         setIsToggled: (state, action: PayloadAction<boolean | null>) => {
             state.isToggled = action.payload ?? false;
         },
-        setStorageLocation: (state, action: PayloadAction<string>) => {
-            state.storageLocation = action.payload
-        },
-        setOutputFormat: (state, action: PayloadAction<string>) => {
-            state.outputFormat = action.payload;
+        setOutputConfig: (state, action: PayloadAction<string[]>) => {
+          state.outputConfig = action.payload;  
         },
         setSaveDetectionImages: (state, action: PayloadAction<boolean | null>) => {
             state.saveDetectionImages = action.payload ?? false;
@@ -33,5 +28,5 @@ const outputConfigurationSlice = createSlice({
     }
 });
 
-export const { setIsToggled, setStorageLocation, setOutputFormat, setSaveDetectionImages} = outputConfigurationSlice.actions;
+export const { setIsToggled, setOutputConfig, setSaveDetectionImages} = outputConfigurationSlice.actions;
 export default outputConfigurationSlice.reducer;

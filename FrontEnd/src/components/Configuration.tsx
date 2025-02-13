@@ -27,7 +27,9 @@ import { ProcessingRulesModel } from "../store/models/ProcessingRules";
 import MediaFrameSelector from "./insights/MediaFrameSelector";
 import { setPreivewUrl as setVideoPreviewUrl } from "../store/api/localData/previewUrl";
 import { setDetectionModel } from "../store/api/localData/detectionModel";
-import { setIsToggled, setStorageLocation, setOutputFormat, setSaveDetectionImages } from "../store/api/localData/outputConfiguration";
+import { setIsToggled, setOutputConfig, setSaveDetectionImages } from "../store/api/localData/outputConfiguration";
+import { setPeopleCount, setDurationRate } from "../store/api/localData/videoResultsData";
+import { setRule1, setRule2 } from "../store/api/localData/processingLogic";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/middleware";
 
@@ -57,18 +59,14 @@ const Configuration = () => {
   
   const dispatch = useDispatch<AppDispatch>();
   const savedPreivewUrl = useSelector((state: RootState) => state.previewUrl.previewUrl);
-  const savedDetectionMdoel = useSelector((state:RootState) => state.detectionModel.selectedModel);
+  const savedDetectionModel = useSelector((state:RootState) => state.detectionModel.selectedModel);
   const savedOutputConfiguration = useSelector((state: RootState) => state.outputConfiguration);
-  
-  React.useEffect(() => {
-    console.log("outputConfiguration", savedOutputConfiguration);
-  }, [savedOutputConfiguration])
-
-  const [selectedModel, setSelectedModel] = React.useState(savedDetectionMdoel || modelRows[0]?.name);
+  const savedProcessingLogic = useSelector((state: RootState) => state.processingLogic);
+  const [selectedModel, setSelectedModel] = React.useState(savedDetectionModel || modelRows[0]?.name);
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = React.useState<string | null>(savedPreivewUrl || null);
-  const [peopleCount, setPeopleCount] = React.useState<number | null>(null);
-  const [durationRate, setDurationRate] = React.useState<number | null>(null);
+  // const [peopleCount, setPeopleCount] = React.useState<number | null>(null);
+  // const [durationRate, setDurationRate] = React.useState<number | null>(null);
   const [rules, setRules] = React.useState<ProcessingRulesModel[]>([]);
   const [params, setParams] = React.useState<Record<string, boolean>>({});
   const [saveOutput, setSaveOutput] = React.useState<boolean>(savedOutputConfiguration.isToggled || false);
@@ -76,13 +74,16 @@ const Configuration = () => {
     outputObject.current_output_configurations
   );
   const [isChecked, setIsChecked] = React.useState<boolean>(savedOutputConfiguration.saveDetectionImages || false);
-
   
 
   if (ruleRows.length > 0 && rules.length === 0) {
+    console.log(ruleRows);
     const newParams = ruleRows.reduce<Record<string, boolean>>(
       (acc, ruleObj) => {
-        if (ruleObj.enabled) {
+        if (
+          (ruleObj.id === "1" && savedProcessingLogic.rule1) || 
+          (ruleObj.id === "2" && savedProcessingLogic.rule2)
+        ) {
           acc[ruleObj.rule] = true;
         }
         return acc;
@@ -111,7 +112,6 @@ const Configuration = () => {
     //   console.error("No file selected");
     //   return;
     // }
-    fetch("http://localhost:8000/clear-frames", { method: "POST" });
 
     const formData = new FormData();
     selectedFile && formData.append("file", selectedFile);
@@ -125,8 +125,8 @@ const Configuration = () => {
           console.log(res.data);
           const { output_video_path, people_count, duration_rate } = res.data;
           console.log(output_video_path);
-          setPeopleCount(people_count);
-          setDurationRate(duration_rate);
+          dispatch(setPeopleCount(people_count));
+          dispatch(setDurationRate(duration_rate));
           alert("Video processed successfully!");
         } else if (res.error) {
           console.error(res.error);
@@ -152,11 +152,24 @@ const Configuration = () => {
     });
   };
 
-  const toggleRule = (rule: string) => {
-    setParams((params) => ({ ...params, [rule]: !params[rule] }));
+  const toggleRule = (rule: string, id: string) => {
+    setParams((params) => {
+      if(id === '1'){
+        dispatch(setRule1(!savedProcessingLogic.rule1));
+      }else{
+        dispatch(setRule2(!savedProcessingLogic.rule2));
+      }
+      return ({ ...params, [rule]: !params[rule] })
+    });
   };
 
   React.useEffect(() => {
+    console.log(savedProcessingLogic);
+  }, [savedProcessingLogic]);
+
+
+  React.useEffect(() => {
+    fetch("http://localhost:8000/clear-frames", { method: "POST" });
     if (outputObject?.current_output_configurations) {
       setOutput(outputObject.current_output_configurations);
     }
@@ -273,7 +286,7 @@ const Configuration = () => {
                     type="checkbox"
                     className="sr-only peer"
                     checked={params[rule.rule]}
-                    onClick={() => toggleRule(rule.rule)}
+                    onClick={() => toggleRule(rule.rule, rule.id)}
                     // readOnly
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
@@ -318,7 +331,6 @@ const Configuration = () => {
                 value={output[0]}
                 onChange={(e) => {
                   setOutput((prev) => [e.target.value, prev[1]])
-                  dispatch(setStorageLocation(e.target.value));
                 }}
               >
                 {outputObject.storage.map((option) => (
@@ -337,7 +349,6 @@ const Configuration = () => {
                 value={output[1]}
                 onChange={(e) => {
                   setOutput((prev) => [prev[0], e.target.value])
-                  dispatch(setOutputFormat(e.target.value));
                 }}
               >
                 {outputObject.format.map((option) => (

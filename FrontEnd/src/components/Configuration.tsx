@@ -164,11 +164,6 @@ const Configuration = () => {
   };
 
   React.useEffect(() => {
-    console.log(savedProcessingLogic);
-  }, [savedProcessingLogic]);
-
-
-  React.useEffect(() => {
     fetch("http://localhost:8000/clear-frames", { method: "POST" });
     if (outputObject?.current_output_configurations) {
       setOutput(outputObject.current_output_configurations);

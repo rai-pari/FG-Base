@@ -3,6 +3,9 @@ import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import { useCreateAreaCoordinatesMutation } from "../../store/api/areaCoordinates";
 import { Crop } from "react-image-crop";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../store/middleware";
+import { setCropArea, setGlobalCapturedFrame, setIsCoordinatesSent, setIsRegionSelected } from "../../store/api/localData/previewUrl";
 
 interface MediaFrameSelectorProps {
   fileURL: string | null;
@@ -10,26 +13,38 @@ interface MediaFrameSelectorProps {
 }
 
 const MediaFrameSelector: React.FC<MediaFrameSelectorProps> = ({ fileURL, isVideo }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const savedCapturedFrame = useSelector((state: RootState) => state.previewUrl.capturedFrame);
+  const savedCropArea = useSelector((state: RootState) => state.previewUrl.cropArea);
+  const savedIsCoordinatesSent = useSelector((state: RootState) => state.previewUrl.isCoordinatesSent);
+  const savedIsRegionSelected = useSelector((state: RootState) => state.previewUrl.isRegionSelected);
   const [createCoordinatesMutation, { isLoading }] = useCreateAreaCoordinatesMutation();
-  const [capturedFrame, setCapturedFrame] = useState<string | null>(null);
+  const [capturedFrame, setCapturedFrame] = useState<string | null>(savedCapturedFrame || null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [crop, setCrop] = useState<Crop>({
-    unit: "%",
-    x: 30,
-    y: 30,
-    width: 25,
-    height: 25,
-  });
+  const [crop, setCrop] = useState<Crop>(
+    (savedCropArea && savedCropArea.width !== 0 && savedCropArea.height !== 0) ? savedCropArea : {
+      unit: "%",
+      x: 30,
+      y: 30,
+      width: 50,
+      height: 50,
+    }
+  );
   const [cropCoordinates, setCropCoordinates] = useState<any>(null);
-  const [coordinatesSent, setCoordinatesSent] = useState(false);
-  const [isRegionConfirmed, setIsRegionConfirmed] = useState(false);
+  const [coordinatesSent, setCoordinatesSent] = useState<boolean>(savedIsCoordinatesSent);
+  const [isRegionConfirmed, setIsRegionConfirmed] = useState<boolean>(savedIsRegionSelected);
 
   const imgRef = useRef<HTMLImageElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
+  React.useEffect(() => {
+    console.log(savedIsRegionSelected);
+  }, [savedIsRegionSelected])
+
   useEffect(() => {
     if (fileURL && !isVideo) {
+      dispatch(setGlobalCapturedFrame(fileURL));
       setCapturedFrame(fileURL);
     }
   }, [fileURL, isVideo]);
@@ -45,6 +60,7 @@ const MediaFrameSelector: React.FC<MediaFrameSelectorProps> = ({ fileURL, isVide
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         const frameData = canvas.toDataURL("image/png");
         setCapturedFrame(frameData);
+        dispatch(setGlobalCapturedFrame(frameData));
         setIsModalOpen(true);
       }
     }
@@ -76,10 +92,15 @@ const MediaFrameSelector: React.FC<MediaFrameSelectorProps> = ({ fileURL, isVide
 
     createCoordinatesMutation(cropCoordinates);
     setCoordinatesSent(true);
+    dispatch(setIsCoordinatesSent(true));
     setIsRegionConfirmed(true);
+    dispatch(setIsRegionSelected(true));
 
     // Preserve the crop after confirmation
-    setCrop((prevCrop) => ({ ...prevCrop }));
+    setCrop((prevCrop) => {
+      dispatch(setCropArea({...prevCrop}));
+      return ({ ...prevCrop })
+    });
 
     setIsModalOpen(false);
   };

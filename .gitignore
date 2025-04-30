@@ -11,3 +11,8 @@ node_modules/
 # Ignore OS-specific files
 .DS_Store
 Thumbs.db
+
+#Ignore models, csv and output videos
+*.pt
+*.csv
+*.mp4
